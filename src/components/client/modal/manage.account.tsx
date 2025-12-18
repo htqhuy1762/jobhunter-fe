@@ -236,9 +236,7 @@ const JobByEmail = (props: any) => {
 const ManageAccount = (props: IProps) => {
     const { open, onClose } = props;
 
-    const onChange = (key: string) => {
-        // console.log(key);
-    };
+    const onChange = (key: string) => {};
 
     const items: TabsProps['items'] = [
         {

@@ -6,9 +6,7 @@ import Access from '@/components/share/access';
 import { ALL_PERMISSIONS } from '@/config/permissions';
 
 const JobTabs = () => {
-    const onChange = (key: string) => {
-        // console.log(key);
-    };
+    const onChange = (key: string) => {};
 
     const items: TabsProps['items'] = [
         {

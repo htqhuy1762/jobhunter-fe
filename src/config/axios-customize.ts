@@ -24,7 +24,6 @@ const DEBUG = import.meta.env.MODE === 'development';
 const handleRefreshToken = async (): Promise<string | null> => {
     return await mutex.runExclusive(async () => {
         try {
-            if (DEBUG) console.log('🔄 [Refresh Token] Attempting to refresh access token...');
 
             // CRITICAL FIX: Gọi trực tiếp axiosClient để tránh interceptor unwrap res.data
             // Instance interceptor đã unwrap res.data → gây lỗi khi access res.data.access_token
@@ -38,22 +37,19 @@ const handleRefreshToken = async (): Promise<string | null> => {
                 }
             );
 
-            if (DEBUG) console.log('✅ [Refresh Token] Response:', res.data);
-
             // Kiểm tra cấu trúc response từ backend
             // Backend trả về: { statusCode, message, data: { access_token } }
             const responseData = res.data as IBackendRes<AccessTokenResponse>;
             if (responseData && responseData.data && responseData.data.access_token) {
                 const newToken = responseData.data.access_token;
-                if (DEBUG) console.log('✅ [Refresh Token] New access token obtained successfully');
                 return newToken;
             }
 
-            if (DEBUG) console.error('❌ [Refresh Token] Invalid response structure:', res.data);
+            if (DEBUG) console.error('[Refresh Token] Invalid response structure:', res.data);
             return null;
         } catch (error: any) {
             if (DEBUG) {
-                console.error('❌ [Refresh Token] Failed:', error.response?.status, error.response?.data);
+                console.error('[Refresh Token] Failed:', error.response?.status, error.response?.data);
             }
             return null;
         }
@@ -80,17 +76,13 @@ instance.interceptors.response.use(
     async (error) => {
         // Safe check: Nếu không có response (network error, CORS, timeout)
         if (!error.response) {
-            if (DEBUG) console.error('❌ [Axios Error] Network error or request failed:', error.message);
+            if (DEBUG) console.error('[Axios Error] Network error or request failed:', error.message);
             return Promise.reject(error);
         }
 
         const status = +error.response.status;
         const config = error.config;
         const url = config?.url || '';
-
-        if (DEBUG) {
-            console.log(`⚠️ [Axios Error] ${status} on ${url}`, error.response.data);
-        }
 
         // Kiểm tra có access_token trước khi retry với refresh token
         const access_token_local = localStorage.getItem('access_token');
@@ -102,8 +94,6 @@ instance.interceptors.response.use(
             && !config.headers[NO_RETRY_HEADER]
             && access_token_local // CHỈ retry nếu có token (tránh gọi refresh khi chưa login)
         ) {
-            if (DEBUG) console.log('🔄 [401 Handler] Token expired, attempting refresh...');
-
             config.headers[NO_RETRY_HEADER] = 'true';
 
             const access_token = await handleRefreshToken();
@@ -113,12 +103,10 @@ instance.interceptors.response.use(
                 config.headers['Authorization'] = `Bearer ${access_token}`;
                 localStorage.setItem('access_token', access_token);
 
-                if (DEBUG) console.log('✅ [401 Handler] Retrying original request with new token');
-
                 return instance.request(config);
             } else {
                 // Refresh failed → logout user
-                if (DEBUG) console.error('❌ [401 Handler] Refresh failed, logging out...');
+                if (DEBUG) console.error('[401 Handler] Refresh failed, logging out...');
 
                 localStorage.removeItem('access_token');
                 store.dispatch(setRefreshTokenAction({
@@ -136,7 +124,7 @@ instance.interceptors.response.use(
         ) {
             const message = error?.response?.data?.error ?? "Refresh token hết hạn. Vui lòng đăng nhập lại.";
 
-            if (DEBUG) console.error('❌ [Refresh Error] Refresh token expired:', message);
+            if (DEBUG) console.error('[Refresh Error] Refresh token expired:', message);
 
             localStorage.removeItem('access_token');
             store.dispatch(setRefreshTokenAction({ status: true, message }));
@@ -154,7 +142,7 @@ instance.interceptors.response.use(
 
         // HANDLE 500 - Server Error
         if (status >= 500) {
-            if (DEBUG) console.error('❌ [Server Error]', error.response.data);
+            if (DEBUG) console.error('[Server Error]', error.response.data);
             notification.error({
                 message: "Lỗi máy chủ",
                 description: "Đã xảy ra lỗi từ phía máy chủ. Vui lòng thử lại sau."

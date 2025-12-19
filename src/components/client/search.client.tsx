@@ -83,7 +83,7 @@ const SearchClient = () => {
             }
         >
             <Row gutter={[20, 20]}>
-                <Col span={24}><h2>Việc Làm IT Cho Developer "Chất"</h2></Col>
+                <Col span={24}><h1>Việc Làm IT Cho Developer "Chất"</h1></Col>
                 <Col span={24} md={16}>
                     <ProForm.Item
                         name="skills"
@@ -123,7 +123,19 @@ const SearchClient = () => {
                     </ProForm.Item>
                 </Col>
                 <Col span={12} md={4}>
-                    <Button type='primary' onClick={() => form.submit()}>Search</Button>
+                    <Button
+                        type='primary'
+                        onClick={() => form.submit()}
+                        style={{
+                            width: '100%',
+                            height: '40px',
+                            fontSize: '16px',
+                            fontWeight: 600,
+                            borderRadius: '8px'
+                        }}
+                    >
+                        Search
+                    </Button>
                 </Col>
             </Row>
         </ProForm>

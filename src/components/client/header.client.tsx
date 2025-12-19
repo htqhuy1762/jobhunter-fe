@@ -4,7 +4,6 @@ import { Avatar, Drawer, Dropdown, MenuProps, Space, message } from 'antd';
 import { Menu, ConfigProvider } from 'antd';
 import styles from '@/styles/client.module.scss';
 import { isMobile } from 'react-device-detect';
-import { FaReact } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
@@ -26,7 +25,17 @@ const Header = (props: any) => {
     const [openMangeAccount, setOpenManageAccount] = useState<boolean>(false);
 
     useEffect(() => {
-        setCurrent(location.pathname);
+        // Match the pathname to menu keys
+        const path = location.pathname;
+        if (path === '/') {
+            setCurrent('/');
+        } else if (path.startsWith('/job')) {
+            setCurrent('/job');
+        } else if (path.startsWith('/company')) {
+            setCurrent('/company');
+        } else {
+            setCurrent(path);
+        }
     }, [location])
 
     const items: MenuProps['items'] = [
@@ -102,9 +111,9 @@ const Header = (props: any) => {
             <div className={styles["header-section"]}>
                 <div className={styles["container"]}>
                     {!isMobile ?
-                        <div style={{ display: "flex", gap: 30 }}>
-                            <div className={styles['brand']} >
-                                <FaReact onClick={() => navigate('/')} title='JobHunter' />
+                        <div style={{ display: "flex", gap: 30, alignItems: "center", width: "100%" }}>
+                            <div className={styles['brand']} onClick={() => navigate('/')} title='JobHunter'>
+                                <img src="/main.svg" alt="JobHunter Logo" />
                             </div>
                             <div className={styles['top-menu']}>
                                 <ConfigProvider

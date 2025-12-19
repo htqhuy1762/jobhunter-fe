@@ -1,0 +1,16 @@
+<svg width="280" height="64" viewBox="0 0 280 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Icon background -->
+  <rect x="6" y="14" width="40" height="36" rx="8" fill="#2563EB"></rect>
+
+  <!-- Briefcase handle -->
+  <rect x="16" y="8" width="20" height="10" rx="4" fill="#1E40AF"></rect>
+
+  <!-- Target circle -->
+  <circle cx="26" cy="32" r="10" fill="none" stroke="white" stroke-width="2"></circle>
+  <circle cx="26" cy="32" r="4" fill="white"></circle>
+
+  <!-- Text -->
+  <text x="60" y="40" font-size="30" font-family="Arial, Helvetica, sans-serif" fill="#111827">
+    Job<tspan fill="#2563EB">Hunter</tspan>
+  </text>
+</svg>

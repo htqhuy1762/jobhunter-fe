@@ -100,6 +100,8 @@ export const callFetchAllSkill = (query: string) => {
  * 
 Module User
  */
+
+// admin only
 export const callCreateUser = (user: IUser) => {
     return axios.post<IBackendRes<IUser>>('/api/v1/users', { ...user })
 }
@@ -114,6 +116,19 @@ export const callDeleteUser = (id: string) => {
 
 export const callFetchUser = (query: string) => {
     return axios.get<IBackendRes<IModelPaginate<IUser>>>(`/api/v1/users?${query}`);
+}
+
+export const callFetchUserById = (id: string) => {
+    return axios.get<IBackendRes<IUser>>(`/api/v1/users/${id}`);
+}
+
+// user himself
+export const callFetchMyProfile = () => {
+    return axios.get<IBackendRes<IUser>>(`/api/v1/users/profile`);
+}
+
+export const callUpdateMyProfile = (user: IUser) => {
+    return axios.put<IBackendRes<IUser>>(`/api/v1/users/profile`, { ...user })
 }
 
 /**
@@ -234,7 +249,7 @@ export const callCreateSubscriber = (subs: ISubscribers) => {
 }
 
 export const callGetSubscriberSkills = () => {
-    return axios.get<IBackendRes<ISubscribers>>('/api/v1/skills')
+    return axios.get<IBackendRes<ISubscribers>>('/api/v1/subscribers/me');
 }
 
 export const callUpdateSubscriber = (subs: ISubscribers) => {

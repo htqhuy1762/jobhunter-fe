@@ -1,13 +1,12 @@
-import { Button, Col, Form, Modal, Row, Select, Table, Tabs, message, notification } from "antd";
+import { Button, Col, Form, Input, InputNumber, Modal, Row, Select, Spin, Table, Tabs, message, notification } from "antd";
 import { isMobile } from "react-device-detect";
 import type { TabsProps } from 'antd';
 import { IResume, ISubscribers } from "@/types/backend";
 import { useState, useEffect } from 'react';
-import { callCreateSubscriber, callFetchAllSkill, callFetchResumeByUser, callGetSubscriberSkills, callUpdateSubscriber } from "@/config/api";
+import { callCreateSubscriber, callFetchAllSkill, callFetchMyProfile, callFetchResumeByUser, callGetSubscriberSkills, callUpdateMyProfile, callUpdateSubscriber } from "@/config/api";
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { MonitorOutlined } from "@ant-design/icons";
-import { SKILLS_LIST } from "@/config/utils";
 import { useAppSelector } from "@/redux/hooks";
 
 interface IProps {
@@ -94,9 +93,123 @@ const UserResume = (props: any) => {
 }
 
 const UserUpdateInfo = (props: any) => {
+    const [form] = Form.useForm();
+    const user = useAppSelector(state => state.account.user);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            if (user?.id) {
+                setIsLoading(true);
+                const res = await callFetchMyProfile();
+                if (res && res.data) {
+                    form.setFieldsValue({
+                        name: res.data.name,
+                        email: res.data.email,
+                        age: res.data.age,
+                        gender: res.data.gender,
+                        address: res.data.address,
+                    });
+                }
+                setIsLoading(false);
+            }
+        };
+        fetchUserData();
+    }, [user?.id]);
+
+    const onFinish = async (values: any) => {
+        const { name, age, gender, address } = values;
+
+        const res = await callUpdateMyProfile({
+            id: user.id,
+            name,
+            age,
+            gender,
+            address,
+            email: user.email
+        });
+
+        if (res.data) {
+            message.success("Cập nhật thông tin thành công");
+            // TODO: Update Redux store with new user info if needed
+        } else {
+            notification.error({
+                message: 'Có lỗi xảy ra',
+                description: res.message
+            });
+        }
+    };
+
     return (
         <div>
-            //todo
+            <Spin spinning={isLoading}>
+                <Form
+                    onFinish={onFinish}
+                    form={form}
+                    layout="vertical"
+                >
+                    <Row gutter={[20, 20]}>
+                        <Col span={24}>
+                            <Form.Item
+                                label="Email"
+                                name="email"
+                            >
+                                <Input disabled />
+                            </Form.Item>
+                        </Col>
+                        <Col span={24}>
+                            <Form.Item
+                                label="Tên hiển thị"
+                                name="name"
+                                rules={[{ required: true, message: 'Vui lòng nhập tên!' }]}
+                            >
+                                <Input placeholder="Nhập tên hiển thị" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                label="Tuổi"
+                                name="age"
+                                rules={[{ required: true, message: 'Vui lòng nhập tuổi!' }]}
+                            >
+                                <InputNumber
+                                    style={{ width: '100%' }}
+                                    min={1}
+                                    max={100}
+                                    placeholder="Nhập tuổi"
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                label="Giới tính"
+                                name="gender"
+                                rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
+                            >
+                                <Select placeholder="Chọn giới tính">
+                                    <Select.Option value="MALE">Nam</Select.Option>
+                                    <Select.Option value="FEMALE">Nữ</Select.Option>
+                                    <Select.Option value="OTHER">Khác</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                        <Col span={24}>
+                            <Form.Item
+                                label="Địa chỉ"
+                                name="address"
+                                rules={[{ required: true, message: 'Vui lòng nhập địa chỉ!' }]}
+                            >
+                                <Input placeholder="Nhập địa chỉ" />
+                            </Form.Item>
+                        </Col>
+                        <Col span={24}>
+                            <Button type="primary" onClick={() => form.submit()}>
+                                Cập nhật thông tin
+                            </Button>
+                        </Col>
+                    </Row>
+                </Form>
+            </Spin>
         </div>
     )
 }
@@ -207,12 +320,12 @@ const JobByEmail = (props: any) => {
                             label={"Kỹ năng"}
                             name={"skills"}
                             rules={[{ required: true, message: 'Vui lòng chọn ít nhất 1 skill!' }]}
-
                         >
                             <Select
                                 mode="multiple"
                                 allowClear
                                 suffixIcon={null}
+                                size="large"
                                 style={{ width: '100%' }}
                                 placeholder={
                                     <>
@@ -225,7 +338,9 @@ const JobByEmail = (props: any) => {
                         </Form.Item>
                     </Col>
                     <Col span={24}>
-                        <Button onClick={() => form.submit()}>Cập nhật</Button>
+                        <Button type="primary" onClick={() => form.submit()}>
+                            Cập nhật
+                        </Button>
                     </Col>
                 </Row>
             </Form>
@@ -236,7 +351,7 @@ const JobByEmail = (props: any) => {
 const ManageAccount = (props: IProps) => {
     const { open, onClose } = props;
 
-    const onChange = (key: string) => {};
+    const onChange = (key: string) => { };
 
     const items: TabsProps['items'] = [
         {

@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@ant-design/icons": "4.8.0",
-    "@ant-design/pro-components": "2.6.46",
-    "@ant-design/pro-layout": "7.17.19",
+    "@ant-design/pro-components": "^2.8.10",
+    "@ant-design/pro-layout": "^7.22.7",
     "@reduxjs/toolkit": "1.9.3",
     "@tanstack/react-query": "^5.90.5",
     "@tanstack/react-query-devtools": "^5.90.2",

@@ -39,38 +39,44 @@ const JobCard = (props: IProps) => {
 
     const fetchJob = async () => {
         setIsLoading(true)
-        let query = `page=${current}&size=${pageSize}`;
-        if (filter) {
-            query += `&${filter}`;
-        }
-        if (sortQuery) {
-            query += `&${sortQuery}`;
-        }
-
-        //check query string
-        const queryLocation = searchParams.get("location");
-        const querySkills = searchParams.get("skills")
-        if (queryLocation || querySkills) {
-            let q = "";
-            if (queryLocation) {
-                q = sfIn("location", queryLocation.split(",")).toString();
+        try {
+            let query = `page=${current}&size=${pageSize}`;
+            if (filter) {
+                query += `&${filter}`;
+            }
+            if (sortQuery) {
+                query += `&${sortQuery}`;
             }
 
-            if (querySkills) {
-                q = queryLocation ?
-                    q + " and " + `${sfIn("skills", querySkills.split(","))}`
-                    : `${sfIn("skills", querySkills.split(","))}`;
+            //check query string
+            const queryLocation = searchParams.get("location");
+            const querySkills = searchParams.get("skills")
+            if (queryLocation || querySkills) {
+                let q = "";
+                if (queryLocation) {
+                    q = sfIn("location", queryLocation.split(",")).toString();
+                }
+
+                if (querySkills) {
+                    q = queryLocation ?
+                        q + " and " + `${sfIn("skills", querySkills.split(","))}`
+                        : `${sfIn("skills", querySkills.split(","))}`;
+                }
+
+                query += `&filter=${encodeURIComponent(q)}`;
             }
 
-            query += `&filter=${encodeURIComponent(q)}`;
+            const res = await callFetchJob(query);
+            if (res && res.data) {
+                setDisplayJob(res.data.result);
+                setTotal(res.data.meta.total)
+            }
+        } catch (error) {
+            console.log('Error fetching jobs:', error);
+            setDisplayJob([]);
+        } finally {
+            setIsLoading(false);
         }
-
-        const res = await callFetchJob(query);
-        if (res && res.data) {
-            setDisplayJob(res.data.result);
-            setTotal(res.data.meta.total)
-        }
-        setIsLoading(false);
     }
 
 

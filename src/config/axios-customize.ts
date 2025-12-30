@@ -24,21 +24,13 @@ const DEBUG = import.meta.env.MODE === 'development';
 const handleRefreshToken = async (): Promise<string | null> => {
     return await mutex.runExclusive(async () => {
         try {
-
-            // CRITICAL FIX: Gọi trực tiếp axiosClient để tránh interceptor unwrap res.data
-            // Instance interceptor đã unwrap res.data → gây lỗi khi access res.data.access_token
             const res = await axiosClient.get(
                 `${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/refresh`,
                 {
-                    withCredentials: true,
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-                    }
+                    withCredentials: true
                 }
             );
 
-            // Kiểm tra cấu trúc response từ backend
-            // Backend trả về: { statusCode, message, data: { access_token } }
             const responseData = res.data as IBackendRes<AccessTokenResponse>;
             if (responseData && responseData.data && responseData.data.access_token) {
                 const newToken = responseData.data.access_token;

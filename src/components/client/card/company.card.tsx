@@ -30,20 +30,26 @@ const CompanyCard = (props: IProps) => {
 
     const fetchCompany = async () => {
         setIsLoading(true)
-        let query = `page=${current}&size=${pageSize}`;
-        if (filter) {
-            query += `&${filter}`;
-        }
-        if (sortQuery) {
-            query += `&${sortQuery}`;
-        }
+        try {
+            let query = `page=${current}&size=${pageSize}`;
+            if (filter) {
+                query += `&${filter}`;
+            }
+            if (sortQuery) {
+                query += `&${sortQuery}`;
+            }
 
-        const res = await callFetchCompany(query);
-        if (res && res.data) {
-            setDisplayCompany(res.data.result);
-            setTotal(res.data.meta.total)
+            const res = await callFetchCompany(query);
+            if (res && res.data) {
+                setDisplayCompany(res.data.result);
+                setTotal(res.data.meta.total)
+            }
+        } catch (error) {
+            console.log('Error fetching companies:', error);
+            setDisplayCompany([]);
+        } finally {
+            setIsLoading(false)
         }
-        setIsLoading(false)
     }
 
 

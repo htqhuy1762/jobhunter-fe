@@ -5,10 +5,6 @@ import { callCreateRole, callFetchPermission, callUpdateRole } from "@/config/ap
 import { IPermission, IRole } from "@/types/backend";
 import { CheckSquareOutlined } from "@ant-design/icons";
 import ModuleApi from "./module.api";
-import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { resetSingleRole } from "@/redux/slice/roleSlide";
-import { groupByPermission } from "@/config/utils";
 
 interface IProps {
     openModal: boolean;
@@ -24,7 +20,6 @@ interface IProps {
 
 const ModalRole = (props: IProps) => {
     const { openModal, setOpenModal, reloadTable, listPermissions, singleRole, setSingleRole } = props;
-    const dispatch = useAppDispatch();
     const [form] = Form.useForm();
 
     const submitRole = async (valuesForm: any) => {

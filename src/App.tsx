@@ -12,7 +12,7 @@ import LoginPage from 'pages/auth/login';
 import RegisterPage from 'pages/auth/register';
 import ChangePasswordPage from 'pages/auth/change-password';
 import LayoutAdmin from 'components/admin/layout.admin';
-import ProtectedRoute, { AuthenticatedRoute } from 'components/share/protected-route.ts';
+import ProtectedRoute, { AdminOnlyRoute, AuthenticatedRoute } from 'components/share/protected-route.ts';
 import Header from 'components/client/header.client';
 import Footer from 'components/client/footer.client';
 import HomePage from 'pages/home';
@@ -109,9 +109,9 @@ export default function App() {
         {
           path: "user",
           element:
-            <ProtectedRoute>
+            <AdminOnlyRoute>
               <UserPage />
-            </ProtectedRoute>
+            </AdminOnlyRoute>
         },
 
         {
@@ -138,16 +138,16 @@ export default function App() {
         {
           path: "permission",
           element:
-            <ProtectedRoute>
+            <AdminOnlyRoute>
               <PermissionPage />
-            </ProtectedRoute>
+            </AdminOnlyRoute>
         },
         {
           path: "role",
           element:
-            <ProtectedRoute>
+            <AdminOnlyRoute>
               <RolePage />
-            </ProtectedRoute>
+            </AdminOnlyRoute>
         }
       ],
     },

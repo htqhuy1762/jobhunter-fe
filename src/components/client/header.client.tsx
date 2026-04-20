@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { callLogout } from '@/config/api';
 import { setLogoutAction } from '@/redux/slice/accountSlide';
 import ManageAccount from './modal/manage.account';
+import { hasBackofficeAccess } from '@/config/utils';
 
 const Header = (props: any) => {
     const navigate = useNavigate();
@@ -85,8 +86,7 @@ const Header = (props: any) => {
             key: 'change-password',
             icon: <LockOutlined />
         },
-        // Chỉ ROLE_ADMIN mới có quyền vào trang admin
-        ...((user.role?.name === 'ROLE_ADMIN') ? [{
+        ...((hasBackofficeAccess(user.role?.name)) ? [{
             label: <Link
                 to={"/admin"}
             >Trang Quản Trị</Link>,

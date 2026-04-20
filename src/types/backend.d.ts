@@ -117,6 +117,17 @@ export interface IResume {
     userId: string;
     url: string;
     status: string;
+    rating?: number;
+    notes?: string;
+    reviewedBy?: number;
+    reviewedAt?: string;
+    interviewDateTime?: string;
+    interviewer?: string;
+    meetingType?: string;
+    meetingLink?: string;
+    meetingLocation?: string;
+    interviewNote?: string;
+    interviewResult?: string;
     companyId: string | {
         id: string;
         name: string;
@@ -136,6 +147,30 @@ export interface IResume {
     deletedAt?: boolean | null;
     createdAt?: string;
     updatedAt?: string;
+
+    companyName?: string;
+    user?: {
+        id: string;
+        name: string;
+    }
+    job?: {
+        id: string;
+        name: string;
+    }
+}
+
+export interface IResumeUpdatePayload {
+    id: string | number;
+    status?: string;
+    rating?: number;
+    notes?: string;
+    interviewDateTime?: string;
+    interviewer?: string;
+    meetingType?: string;
+    meetingLink?: string;
+    meetingLocation?: string;
+    interviewNote?: string;
+    interviewResult?: string;
 }
 
 export interface IPermission {

@@ -120,3 +120,7 @@ export const isUser = (roleName?: string): boolean => {
 export const hasAdminAccess = (roleName?: string): boolean => {
     return roleName === ROLES.ADMIN;
 };
+
+export const hasBackofficeAccess = (roleName?: string): boolean => {
+    return roleName === ROLES.ADMIN || roleName === ROLES.HR;
+};

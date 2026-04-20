@@ -9,6 +9,30 @@ interface IProps {
     permission: { method: string, apiPath: string, module: string };
 }
 
+const MODULE_ALIASES: Record<string, string> = {
+    USERS: 'USER',
+    ROLES: 'ROLE',
+    PERMISSIONS: 'PERMISSION',
+    COMPANIES: 'COMPANY',
+    JOBS: 'JOB',
+    SKILLS: 'SKILL',
+    RESUMES: 'RESUME',
+    FILES: 'FILE',
+    SUBSCRIBERS: 'SUBSCRIBER',
+};
+
+const normalizeModule = (module?: string) => {
+    const value = module?.toUpperCase().trim();
+    if (!value) return '';
+    return MODULE_ALIASES[value] ?? value;
+};
+
+const normalizePath = (path?: string) => {
+    return (path ?? '')
+        .replace(/\/(\*|\*\*)$/, '')
+        .replace(/\/\{[^}]+\}$/, '');
+};
+
 const Access = (props: IProps) => {
     const { permission, hideChildren = false } = props;
 
@@ -41,12 +65,12 @@ const Access = (props: IProps) => {
         const check = permissions.find(item => {
             // Case-insensitive comparison
             const methodMatch = item.method?.toUpperCase() === permission.method?.toUpperCase();
-            const moduleMatch = item.module?.toUpperCase() === permission.module?.toUpperCase();
+            const moduleMatch = normalizeModule(item.module) === normalizeModule(permission.module);
 
             // Flexible API path matching để handle backend trả về khác format
-            // Backend có thể trả: /api/v1/companies/** hoặc /api/v1/companies/{id}
-            const normalizedItemPath = item.apiPath?.replace(/\/\*\*$/, '').replace(/\/\{[^}]+\}$/, '');
-            const normalizedPermPath = permission.apiPath?.replace(/\/\*\*$/, '').replace(/\/\{[^}]+\}$/, '');
+            // Backend có thể trả: /api/v1/companies/* hoặc /api/v1/companies/{id}
+            const normalizedItemPath = normalizePath(item.apiPath);
+            const normalizedPermPath = normalizePath(permission.apiPath);
 
             const apiPathMatch =
                 item.apiPath === permission.apiPath  // Exact match

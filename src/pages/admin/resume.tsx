@@ -108,10 +108,16 @@ const ResumePage = () => {
                     valueEnum={{
                         PENDING: 'PENDING',
                         REVIEWING: 'REVIEWING',
+                        SHORTLISTED: 'SHORTLISTED',
+                        INTERVIEW_SCHEDULED: 'INTERVIEW_SCHEDULED',
+                        INTERVIEWED: 'INTERVIEWED',
+                        OFFERED: 'OFFERED',
+                        HIRED: 'HIRED',
                         APPROVED: 'APPROVED',
                         REJECTED: 'REJECTED',
+                        WITHDRAWN: 'WITHDRAWN',
                     }}
-                    placeholder="Chọn level"
+                    placeholder="Chọn trạng thái"
                 />
             ),
         },

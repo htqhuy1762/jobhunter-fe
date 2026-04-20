@@ -20,6 +20,7 @@ import { isMobile } from 'react-device-detect';
 import type { MenuProps } from 'antd';
 import { setLogoutAction } from '@/redux/slice/accountSlide';
 import { ALL_PERMISSIONS } from '@/config/permissions';
+import { isAdmin as isAdminRole, isHR as isHrRole } from '@/config/utils';
 
 const { Content, Sider } = Layout;
 
@@ -38,7 +39,8 @@ const LayoutAdmin = () => {
 
     useEffect(() => {
         const ACL_ENABLE = import.meta.env.VITE_ACL_ENABLE;
-        const isAdmin = user.role?.name === 'ROLE_ADMIN';
+        const isAdmin = isAdminRole(user.role?.name);
+        const isHR = isHrRole(user.role?.name);
 
         // ROLE_ADMIN luôn có full menu, không cần check permissions
         if (isAdmin || permissions?.length || ACL_ENABLE === 'false') {
@@ -48,7 +50,7 @@ const LayoutAdmin = () => {
                 && item.method === ALL_PERMISSIONS.COMPANIES.GET_PAGINATE.method
             )
 
-            const viewUser = isAdmin || permissions?.find(item =>
+            const viewUser = permissions?.find(item =>
                 item.apiPath === ALL_PERMISSIONS.USERS.GET_PAGINATE.apiPath
                 && item.method === ALL_PERMISSIONS.USERS.GET_PAGINATE.method
             )
@@ -63,15 +65,17 @@ const LayoutAdmin = () => {
                 && item.method === ALL_PERMISSIONS.RESUMES.GET_PAGINATE.method
             )
 
-            const viewRole = isAdmin || permissions?.find(item =>
+            const viewRole = permissions?.find(item =>
                 item.apiPath === ALL_PERMISSIONS.ROLES.GET_PAGINATE.apiPath
                 && item.method === ALL_PERMISSIONS.ROLES.GET_PAGINATE.method
             )
 
-            const viewPermission = isAdmin || permissions?.find(item =>
+            const viewPermission = permissions?.find(item =>
                 item.apiPath === ALL_PERMISSIONS.PERMISSIONS.GET_PAGINATE.apiPath
-                && item.method === ALL_PERMISSIONS.USERS.GET_PAGINATE.method
+                && item.method === ALL_PERMISSIONS.PERMISSIONS.GET_PAGINATE.method
             )
+
+            const canViewSystemMenu = isAdmin || !isHR;
 
             const full = [
                 {
@@ -85,7 +89,7 @@ const LayoutAdmin = () => {
                     icon: <BankOutlined />,
                 }] : []),
 
-                ...(viewUser || ACL_ENABLE === 'false' ? [{
+                ...(canViewSystemMenu && (isAdmin || viewUser || ACL_ENABLE === 'false') ? [{
                     label: <Link to='/admin/user'>User</Link>,
                     key: '/admin/user',
                     icon: <UserOutlined />
@@ -101,12 +105,12 @@ const LayoutAdmin = () => {
                     key: '/admin/resume',
                     icon: <AliwangwangOutlined />
                 }] : []),
-                ...(viewPermission || ACL_ENABLE === 'false' ? [{
+                ...(canViewSystemMenu && (isAdmin || viewPermission || ACL_ENABLE === 'false') ? [{
                     label: <Link to='/admin/permission'>Permission</Link>,
                     key: '/admin/permission',
                     icon: <ApiOutlined />
                 }] : []),
-                ...(viewRole || ACL_ENABLE === 'false' ? [{
+                ...(canViewSystemMenu && (isAdmin || viewRole || ACL_ENABLE === 'false') ? [{
                     label: <Link to='/admin/role'>Role</Link>,
                     key: '/admin/role',
                     icon: <ExceptionOutlined />
@@ -167,7 +171,7 @@ const LayoutAdmin = () => {
                         collapsed={collapsed}
                         onCollapse={(value) => setCollapsed(value)}>
                         <div style={{ height: 32, margin: 16, textAlign: 'center' }}>
-                            <BugOutlined />  ADMIN
+                            <BugOutlined /> {isAdminRole(user.role?.name) ? 'ADMIN' : 'HR'}
                         </div>
                         <Menu
                             selectedKeys={[activeMenu]}

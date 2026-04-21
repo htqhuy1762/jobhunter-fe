@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { callCreateUser, callDeleteUser, callFetchUser, callUpdateUser } from '@/config/api';
 import { IUser } from '@/types/backend';
 import { message, notification } from 'antd';
+import { assertBackendSuccess } from './mutation-helpers';
 
 // Query key factory - để quản lý cache dễ dàng
 export const userKeys = {
@@ -33,7 +34,10 @@ export const useCreateUser = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (user: IUser) => callCreateUser(user),
+        mutationFn: async (user: IUser) => {
+            const res = await callCreateUser(user);
+            return assertBackendSuccess(res, 'Không thể tạo user');
+        },
         onSuccess: () => {
             // Invalidate và refetch danh sách users
             queryClient.invalidateQueries({ queryKey: userKeys.lists() });
@@ -55,7 +59,10 @@ export const useUpdateUser = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (user: IUser) => callUpdateUser(user),
+        mutationFn: async (user: IUser) => {
+            const res = await callUpdateUser(user);
+            return assertBackendSuccess(res, 'Không thể cập nhật user');
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: userKeys.lists() });
             message.success('Cập nhật User thành công');
@@ -76,7 +83,10 @@ export const useDeleteUser = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (id: string) => callDeleteUser(id),
+        mutationFn: async (id: string) => {
+            const res = await callDeleteUser(id);
+            return assertBackendSuccess(res, 'Không thể xóa user');
+        },
         // ⚡ Optimistic update: Xóa ngay trong UI trước khi API response
         onMutate: async (deletedId) => {
             // Cancel ongoing queries

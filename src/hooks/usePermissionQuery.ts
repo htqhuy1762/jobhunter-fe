@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { callFetchPermission, callFetchPermissionById, callCreatePermission, callUpdatePermission, callDeletePermission } from '@/config/api';
 import { IPermission } from '@/types/backend';
 import { message, notification } from 'antd';
+import { assertBackendSuccess } from './mutation-helpers';
 
 // Query keys factory
 export const permissionKeys = {
@@ -40,7 +41,10 @@ export const useCreatePermission = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (permission: IPermission) => callCreatePermission(permission),
+        mutationFn: async (permission: IPermission) => {
+            const res = await callCreatePermission(permission);
+            return assertBackendSuccess(res, 'Không thể tạo permission');
+        },
         onSuccess: () => {
             message.success('Tạo mới Permission thành công');
             queryClient.invalidateQueries({ queryKey: permissionKeys.lists() });
@@ -59,8 +63,10 @@ export const useUpdatePermission = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ permission, id }: { permission: IPermission; id: string }) =>
-            callUpdatePermission(permission, id),
+        mutationFn: async ({ permission, id }: { permission: IPermission; id: string }) => {
+            const res = await callUpdatePermission(permission, id);
+            return assertBackendSuccess(res, 'Không thể cập nhật permission');
+        },
         onSuccess: () => {
             message.success('Cập nhật Permission thành công');
             queryClient.invalidateQueries({ queryKey: permissionKeys.all });
@@ -79,7 +85,10 @@ export const useDeletePermission = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (id: string) => callDeletePermission(id),
+        mutationFn: async (id: string) => {
+            const res = await callDeletePermission(id);
+            return assertBackendSuccess(res, 'Không thể xóa permission');
+        },
         onSuccess: () => {
             message.success('Xóa Permission thành công');
             queryClient.invalidateQueries({ queryKey: permissionKeys.lists() });

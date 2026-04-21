@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { callFetchResume, callFetchResumeById, callDeleteResume } from '@/config/api';
 import { message, notification } from 'antd';
+import { assertBackendSuccess } from './mutation-helpers';
 
 // Query keys factory
 export const resumeKeys = {
@@ -38,7 +39,10 @@ export const useDeleteResume = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (id: string) => callDeleteResume(id),
+        mutationFn: async (id: string) => {
+            const res = await callDeleteResume(id);
+            return assertBackendSuccess(res, 'Không thể xóa resume');
+        },
         onSuccess: () => {
             message.success('Xóa Resume thành công');
             queryClient.invalidateQueries({ queryKey: resumeKeys.lists() });

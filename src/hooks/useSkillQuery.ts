@@ -2,13 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { callCreateSkill, callDeleteSkill, callUpdateSkill } from '@/config/api';
 import { message, notification } from 'antd';
 import axios from '@/config/axios-customize';
-
-const assertBackendSuccess = (res: any, fallbackMessage: string) => {
-    if (!res || +res.statusCode >= 400) {
-        throw new Error(res?.message || fallbackMessage);
-    }
-    return res;
-};
+import { assertBackendSuccess } from './mutation-helpers';
 
 // Query keys factory
 export const skillKeys = {

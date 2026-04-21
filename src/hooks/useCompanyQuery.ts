@@ -8,6 +8,7 @@ import {
 } from '@/config/api';
 import { ICompany } from '@/types/backend';
 import { message, notification } from 'antd';
+import { assertBackendSuccess } from './mutation-helpers';
 
 export const companyKeys = {
     all: ['companies'] as const,
@@ -51,12 +52,15 @@ export const useCreateCompany = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ name, address, description, logo }: {
+        mutationFn: async ({ name, address, description, logo }: {
             name: string;
             address: string;
             description: string;
             logo: string
-        }) => callCreateCompany(name, address, description, logo),
+        }) => {
+            const res = await callCreateCompany(name, address, description, logo);
+            return assertBackendSuccess(res, 'Không thể tạo company');
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
             message.success('Tạo mới Company thành công');
@@ -77,13 +81,16 @@ export const useUpdateCompany = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ id, name, address, description, logo }: {
+        mutationFn: async ({ id, name, address, description, logo }: {
             id: string;
             name: string;
             address: string;
             description: string;
             logo: string
-        }) => callUpdateCompany(id, name, address, description, logo),
+        }) => {
+            const res = await callUpdateCompany(id, name, address, description, logo);
+            return assertBackendSuccess(res, 'Không thể cập nhật company');
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
             message.success('Cập nhật Company thành công');
@@ -104,7 +111,10 @@ export const useDeleteCompany = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (id: string) => callDeleteCompany(id),
+        mutationFn: async (id: string) => {
+            const res = await callDeleteCompany(id);
+            return assertBackendSuccess(res, 'Không thể xóa company');
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: companyKeys.lists() });
             message.success('Xóa Company thành công');

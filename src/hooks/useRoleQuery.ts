@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { callCreateRole, callDeleteRole, callFetchRole, callFetchRoleById, callUpdateRole } from '@/config/api';
 import { IRole } from '@/types/backend';
 import { message, notification } from 'antd';
+import { assertBackendSuccess } from './mutation-helpers';
 
 // Query keys factory
 export const roleKeys = {
@@ -40,7 +41,10 @@ export const useCreateRole = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (role: IRole) => callCreateRole(role),
+        mutationFn: async (role: IRole) => {
+            const res = await callCreateRole(role);
+            return assertBackendSuccess(res, 'Không thể tạo role');
+        },
         onSuccess: () => {
             message.success('Tạo mới Role thành công');
             // Invalidate all role lists to refetch
@@ -60,8 +64,10 @@ export const useUpdateRole = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ role, id }: { role: IRole; id: string }) =>
-            callUpdateRole(role, id),
+        mutationFn: async ({ role, id }: { role: IRole; id: string }) => {
+            const res = await callUpdateRole(role, id);
+            return assertBackendSuccess(res, 'Không thể cập nhật role');
+        },
         onSuccess: () => {
             message.success('Cập nhật Role thành công');
             // Invalidate all role queries
@@ -81,7 +87,10 @@ export const useDeleteRole = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (id: string) => callDeleteRole(id),
+        mutationFn: async (id: string) => {
+            const res = await callDeleteRole(id);
+            return assertBackendSuccess(res, 'Không thể xóa role');
+        },
         onMutate: async (deletedId) => {
             await queryClient.cancelQueries({ queryKey: roleKeys.lists() });
             const previousData = queryClient.getQueriesData({ queryKey: roleKeys.lists() });

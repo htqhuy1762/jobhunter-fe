@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { callCreateJob, callDeleteJob, callFetchJob, callFetchJobById, callUpdateJob } from '@/config/api';
 import { IJob } from '@/types/backend';
 import { message, notification } from 'antd';
+import { assertBackendSuccess } from './mutation-helpers';
 
 // Query keys factory
 export const jobKeys = {
@@ -39,7 +40,10 @@ export const useCreateJob = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (job: IJob) => callCreateJob(job),
+        mutationFn: async (job: IJob) => {
+            const res = await callCreateJob(job);
+            return assertBackendSuccess(res, 'Không thể tạo job');
+        },
         onSuccess: () => {
             message.success('Tạo mới Job thành công');
             queryClient.invalidateQueries({ queryKey: jobKeys.lists() });
@@ -58,8 +62,10 @@ export const useUpdateJob = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ job, id }: { job: IJob; id: string }) =>
-            callUpdateJob(job, id),
+        mutationFn: async ({ job, id }: { job: IJob; id: string }) => {
+            const res = await callUpdateJob(job, id);
+            return assertBackendSuccess(res, 'Không thể cập nhật job');
+        },
         onSuccess: () => {
             message.success('Cập nhật Job thành công');
             queryClient.invalidateQueries({ queryKey: jobKeys.all });
@@ -78,7 +84,10 @@ export const useDeleteJob = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (id: string) => callDeleteJob(id),
+        mutationFn: async (id: string) => {
+            const res = await callDeleteJob(id);
+            return assertBackendSuccess(res, 'Không thể xóa job');
+        },
         onSuccess: () => {
             message.success('Xóa Job thành công');
             queryClient.invalidateQueries({ queryKey: jobKeys.lists() });

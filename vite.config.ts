@@ -1,5 +1,5 @@
 import { defineConfig, loadEnv, type PluginOption } from 'vite'
-import react from '@vitejs/plugin-react-swc'
+import react from '@vitejs/plugin-react'
 import path from 'path';
 import { visualizer } from "rollup-plugin-visualizer";
 import dns from 'dns';
@@ -16,7 +16,7 @@ export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
     plugins: [
-      react(), 
+      react(),
       // visualizer() as PluginOption
     ],
     server: {
